@@ -22,13 +22,15 @@ function build_m2crypto() {
 	push_arm
 
 	# build python extension
-
-	export CFLAGS="-I/$BUILD_path/python-install/include/python2.7"
+	export CFLAGS="$CFLAGS -I$BUILD_PATH/python-install/include/python2.7"
+	export PYTHONPATH=$BUILD_PATH/python-install/lib/python2.7/site-packages
 
 	try $BUILD_hostpython/hostpython setup.py build_ext -v
-	try find build/lib.* -name "*.o" -exec $STRIP {} \;
 
-	try $BUILD_hostpython/hostpython setup.py install -O2
+	# strip runs in dist later, right?
+	# try find build/lib.* -name "*.o" -exec $STRIP {} \;
+
+	try $BUILD_hostpython/hostpython setup.py install -O2 --prefix $BUILD_PATH/python-install
 
 	pop_arm
 }
