@@ -8,7 +8,6 @@ BUILD_m2crypto=$BUILD_PATH/m2crypto/$(get_directory $URL_m2crypto)
 RECIPE_m2crypto=$RECIPES_PATH/m2crypto
 
 function prebuild_m2crypto() {
-	# FIXME patch m2crypto's setup.cfg to get headers from to $BUILD_openssl
 	true
 }
 
@@ -27,7 +26,7 @@ function build_m2crypto() {
 	export LDSHARED=$LIBLINK
 	export PYTHONPATH=$BUILD_PATH/python-install/lib/python2.7/site-packages
 
-	try $BUILD_hostpython/hostpython setup.py build_ext -v --openssl=$BUILD_openssl --library-dirs=$BUILD_openssl
+	try $BUILD_hostpython/hostpython setup.py build_ext --openssl=$BUILD_openssl --library-dirs=$BUILD_openssl
 	
 	unset LDSHARED
 	
