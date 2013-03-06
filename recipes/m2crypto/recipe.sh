@@ -8,6 +8,7 @@ BUILD_m2crypto=$BUILD_PATH/m2crypto/$(get_directory $URL_m2crypto)
 RECIPE_m2crypto=$RECIPES_PATH/m2crypto
 
 function prebuild_m2crypto() {
+	# FIXME patch m2crypto's setup.cfg to get headers from to $BUILD_openssl
 	true
 }
 
