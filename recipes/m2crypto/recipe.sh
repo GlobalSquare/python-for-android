@@ -21,16 +21,16 @@ function build_m2crypto() {
 	fi
 	
 	push_arm
-
+	
 	# build python extension
 	export CFLAGS="$CFLAGS -I$BUILD_PATH/python-install/include/python2.7"
+	export LDSHARED=$LIBLINK
 	export PYTHONPATH=$BUILD_PATH/python-install/lib/python2.7/site-packages
 
-	try $BUILD_hostpython/hostpython setup.py build_ext -v
-
-	# strip runs in dist later, right?
-	# try find build/lib.* -name "*.o" -exec $STRIP {} \;
-
+	try $BUILD_hostpython/hostpython setup.py build_ext -v --openssl=$BUILD_openssl --library-dirs=$BUILD_openssl
+	
+	unset LDSHARED
+	
 	try $BUILD_hostpython/hostpython setup.py install -O2 --prefix $BUILD_PATH/python-install
 
 	pop_arm
@@ -39,3 +39,4 @@ function build_m2crypto() {
 function postbuild_m2crypto() {
 	true
 }
+
