@@ -1,7 +1,7 @@
 #!/bin/bash
 
 VERSION_netifaces=0.8
-DEPS_netifaces=(hostpython python)
+DEPS_netifaces=(hostpython python setuptools)
 URL_netifaces=http://alastairs-place.net/projects/netifaces/netifaces-0.8.tar.gz
 MD5_netifaces=e57e5983f4c286fac5f8068fbfc5c873
 BUILD_netifaces=$BUILD_PATH/netifaces/$(get_directory $URL_netifaces)
@@ -24,9 +24,8 @@ function build_netifaces() {
 	# build python extension
 	export CFLAGS="$CFLAGS -I$BUILD_PATH/python-install/include/python2.7"
 	export LDSHARED=$LIBLINK
-	export PYTHONPATH=$BUILD_PATH/python-install/lib/python2.7/site-packages:$BUILD_hostpython/Lib/site-packages
+	export PYTHONPATH=$BUILD_PATH/python-install/lib/python2.7/site-packages
 	
-	#FIXME can't build without setuptools
 	#FIXME resulting .so is empty
 	try $BUILD_hostpython/hostpython setup.py build_ext -v
 	
