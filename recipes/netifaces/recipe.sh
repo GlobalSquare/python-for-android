@@ -24,8 +24,10 @@ function build_netifaces() {
 	# build python extension
 	export CFLAGS="$CFLAGS -I$BUILD_PATH/python-install/include/python2.7"
 	export LDSHARED=$LIBLINK
-	export PYTHONPATH=$BUILD_PATH/python-install/lib/python2.7/site-packages
-
+	export PYTHONPATH=$BUILD_PATH/python-install/lib/python2.7/site-packages:$BUILD_hostpython/Lib/site-packages
+	
+	#FIXME can't build without setuptools
+	#FIXME resulting .so is empty
 	try $BUILD_hostpython/hostpython setup.py build_ext -v
 	
 	unset LDSHARED
