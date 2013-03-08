@@ -26,7 +26,7 @@ function build_netifaces() {
 	export LDSHARED=$LIBLINK
 	export PYTHONPATH=$BUILD_PATH/python-install/lib/python2.7/site-packages
 	
-	#FIXME resulting .so is empty
+	# resulting .so is empty but .o will be collected into libpymodules.so in final distribute.sh step
 	try $BUILD_hostpython/hostpython setup.py build_ext -v
 	
 	unset LDSHARED
