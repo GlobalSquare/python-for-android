@@ -1,7 +1,9 @@
 #!/bin/bash
 
+#TODO get a release version if possible
 VERSION_libswift=
 DEPS_libswift=()
+#TODO get a version specific URL and update the md5sum
 URL_libswift=https://github.com/whirm/tgs-android/archive/master.zip
 MD5_libswift=23ce86e2bd4d213fdcf1d8c5c37a979a
 BUILD_libswift=$BUILD_PATH/libswift/$(get_directory $URL_libswift)
@@ -14,8 +16,7 @@ function prebuild_libswift() {
 function build_libswift() {
 	cd $BUILD_libswift
 	
-	#FIXME check for .so
-	if [ -d "$BUILD_PATH/python-install/lib/python2.7/site-packages/libswift" ]; then
+	if [ -d "$BUILD_PATH/libs/libevent.so" ]; then
 		#return
 		true
 	fi
@@ -27,7 +28,7 @@ function build_libswift() {
 	try ndk-build -C $BUILD_libswift/jni
 	unset LDFLAGS
 
-	echo "Copying libs:"
+	#TODO find out why it's libevent.so and not libswift.so
 	try cp -a $BUILD_libswift/libs/$ARCH/*.so $LIBS_PATH
 
 	pop_arm
