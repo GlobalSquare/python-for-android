@@ -2,7 +2,7 @@
 
 VERSION_netifaces=0.8
 DEPS_netifaces=(hostpython python setuptools)
-URL_netifaces=http://alastairs-place.net/projects/netifaces/netifaces-0.8.tar.gz
+URL_netifaces=http://alastairs-place.net/projects/netifaces/netifaces-$VERSION_netifaces.tar.gz
 MD5_netifaces=e57e5983f4c286fac5f8068fbfc5c873
 BUILD_netifaces=$BUILD_PATH/netifaces/$(get_directory $URL_netifaces)
 RECIPE_netifaces=$RECIPES_PATH/netifaces
@@ -13,7 +13,8 @@ function prebuild_netifaces() {
 
 function build_netifaces() {
 	cd $BUILD_netifaces
-
+	
+	#FIXME it actually builds an egg
 	if [ -d "$BUILD_PATH/python-install/lib/python2.7/site-packages/netifaces" ]; then
 		#return
 		true
@@ -27,7 +28,7 @@ function build_netifaces() {
 	export PYTHONPATH=$BUILD_PATH/python-install/lib/python2.7/site-packages
 	
 	# resulting .so is empty but .o will be collected into libpymodules.so in final distribute.sh step
-	try $BUILD_hostpython/hostpython setup.py build_ext -v
+	try $BUILD_hostpython/hostpython setup.py build_ext
 	
 	unset LDSHARED
 	
