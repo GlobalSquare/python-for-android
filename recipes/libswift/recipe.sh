@@ -24,7 +24,7 @@ function build_libswift() {
 	push_arm
 	
 	#FIXME get it so you don't have to download the jni module manually
-	export $LDFLAGS=$LIBLINK
+	export LDFLAGS=$LIBLINK
 	try ndk-build -C $BUILD_libswift/jni
 	unset LDFLAGS
 

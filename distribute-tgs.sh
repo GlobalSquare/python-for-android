@@ -1,2 +1,2 @@
 #!/bin/bash
-./distribute -m "sdl m2crypto netifaces libswift kivy"
+./distribute.sh -m "libswift m2crypto netifaces sqlite3 kivy sdl"
