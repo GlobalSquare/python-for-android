@@ -26,6 +26,7 @@ LIBS_PATH="$ROOT_PATH/build/libs"
 JAVACLASS_PATH="$ROOT_PATH/build/java"
 PACKAGES_PATH="$ROOT_PATH/.packages"
 SRC_PATH="$ROOT_PATH/src"
+JNI_PATH="$SRC_PATH/jni"
 TEMPLATES_PATH="$SRC_PATH/templates"
 DIST_PATH="$ROOT_PATH/dist/default"
 
@@ -222,6 +223,7 @@ function usage() {
 	echo "  -f                     Restart from scratch (remove the current build)"
         echo "  -x                     display expanded values (execute 'set -x')"
 	echo "  -t                     Path to custom templates directory"
+	echo "  -j                     Path to custom src/jni directory"
 	echo
 	exit 0
 }
@@ -662,7 +664,7 @@ function arm_deduplicate() {
 
 
 # Do the build
-while getopts ":hvlfxm:d:s" opt; do
+while getopts ":hvlfxtjm:d:s" opt; do
 	case $opt in
 		h)
 			usage
@@ -692,6 +694,9 @@ while getopts ":hvlfxm:d:s" opt; do
 			;;
 		t)
 			TEMPLATES_PATH="$OPTARG"
+			;;
+		j)
+			JNI_PATH="$OPTARG"
 			;;
 			
 		\?)
