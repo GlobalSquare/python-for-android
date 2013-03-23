@@ -2,6 +2,7 @@ build
 *.swp
 *.swo
 *~
+src/minimal/obj
 src/obj
 src/local.properties
 src/default.properties

@@ -27,7 +27,7 @@ JAVACLASS_PATH="$ROOT_PATH/build/java"
 PACKAGES_PATH="$ROOT_PATH/.packages"
 SRC_PATH="$ROOT_PATH/src"
 JNI_PATH="$SRC_PATH/jni"
-TEMPLATES_PATH="$SRC_PATH/templates"
+TEMPLATE_ROOT="$SRC_PATH"
 DIST_PATH="$ROOT_PATH/dist/default"
 
 # Tools
@@ -222,7 +222,7 @@ function usage() {
 	echo "  -m 'mod1 mod2'         Modules to include"
 	echo "  -f                     Restart from scratch (remove the current build)"
         echo "  -x                     display expanded values (execute 'set -x')"
-	echo "  -t                     Path to custom templates directory"
+	echo "  -t                     Path to custom template root directory"
 	echo "  -j                     Path to custom src/jni directory"
 	echo
 	exit 0
@@ -569,8 +569,8 @@ function run_distribute() {
 	try cp -a $SRC_PATH/local.properties .
 	try cp -a $SRC_PATH/build.py .
 	try cp -a $SRC_PATH/buildlib .
-	try cp -a $SRC_PATH/src .
-	try cp -a $TEMPLATES_PATH .
+	try cp -a $TEMPLATE_ROOT/src .
+	try cp -a $TEMPLATE_ROOT/templates .
 	try cp -a $SRC_PATH/res .
 	try cp -a $SRC_PATH/blacklist.txt .
 

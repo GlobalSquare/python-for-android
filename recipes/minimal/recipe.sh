@@ -12,7 +12,7 @@ function prebuild_minimal() {
 }
 
 function build_minimal() {
-	cd $SRC_PATH/minimal-jni
+	cd $SRC_PATH/minimal/jni
 
 	push_arm
 	try ndk-build V=1
