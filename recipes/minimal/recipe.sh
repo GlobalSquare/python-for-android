@@ -18,7 +18,7 @@ function build_minimal() {
 	try ndk-build V=1
 	pop_arm
 
-	try cp -a $SRC_PATH/libs/$ARCH/*.so $LIBS_PATH
+	try cp -a $SRC_PATH/minimal/libs/$ARCH/*.so $LIBS_PATH
 }
 
 function postbuild_minimal() {

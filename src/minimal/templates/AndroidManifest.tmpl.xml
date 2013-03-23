@@ -10,7 +10,7 @@
                android:icon="@drawable/icon"
                >
 
-    <activity android:name="org.renpy.android.PythonActivity"
+    <activity android:name="org.kivy.android.PythonActivity"
               android:label="@string/iconName"
               android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|fontScale|uiMode"
               android:launchMode="singleTask"

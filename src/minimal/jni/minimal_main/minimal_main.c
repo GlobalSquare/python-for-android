@@ -16,8 +16,8 @@
 #endif
 
 
-#ifndef SDL_JAVA_PACKAGE_PATH
-#error You have to define SDL_JAVA_PACKAGE_PATH to your package path with dots replaced with underscores, for example "com_example_SanAngeles"
+#ifndef MINIMAL_JAVA_PACKAGE_PATH
+#error You have to define MINIMAL_JAVA_PACKAGE_PATH to your package path with dots replaced with underscores, for example "com_example_SanAngeles"
 #endif
 #define JAVA_EXPORT_NAME2(name,package) Java_##package##_##name
 #define JAVA_EXPORT_NAME1(name,package) JAVA_EXPORT_NAME2(name,package)
@@ -26,11 +26,50 @@
 
 static int isSdcardUsed = 0;
 
+
+// JNI env stuff from sdl/src/video/android/SDL_androidvideo.c
+// Extremely wicked JNI environment to call Java functions from C code
+static JNIEnv* JavaEnv = NULL;
+static jobject JavaRenderer = NULL;
+static jclass JavaRendererClass = NULL;
+static jmethodID JavaCheckPause = NULL;
+static jmethodID JavaWaitForResume = NULL;
+
+// for pyjnius
+JNIEnv *SDL_ANDROID_GetJNIEnv()
+{
+    return JavaEnv;
+}
+
+int SDL_ANDROID_CheckPause()
+{
+    int rv;
+    
+    rv = (*JavaEnv)->CallIntMethod( JavaEnv, JavaRenderer, JavaCheckPause );
+    return rv;
+}
+
+void SDL_ANDROID_WaitForResume()
+{
+    (*JavaEnv)->CallVoidMethod(JavaEnv, JavaRenderer, JavaWaitForResume);
+}
+
+
+// for PythonActivity
+#define gref(x) (*env)->NewGlobalRef(env, (x))
 extern C_LINKAGE void
 JAVA_EXPORT_NAME(PythonActivity_nativeInit) ( JNIEnv*  env, jobject thiz )
 {
 	int argc = 1;
 	char * argv[] = { "minimal" };
+
+	// from sdl/src/video/android/SDL_androidvideo.c
+	JavaEnv = env;
+	JavaRenderer = gref(thiz);
+	JavaRendererClass = (*JavaEnv)->GetObjectClass(JavaEnv, thiz);
+	JavaCheckPause = (*JavaEnv)->GetMethodID(JavaEnv, JavaRendererClass, "checkPause", "()I");
+    JavaWaitForResume = (*JavaEnv)->GetMethodID(JavaEnv, JavaRendererClass, "waitForResume", "()V");
+
 	main( argc, argv );
 };
 

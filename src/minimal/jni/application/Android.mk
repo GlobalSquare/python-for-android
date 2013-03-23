@@ -7,9 +7,9 @@ LOCAL_MODULE := application
 APP_SUBDIRS := $(patsubst $(LOCAL_PATH)/%, %, $(shell find $(LOCAL_PATH)/src/ -type d))
 
 LOCAL_CFLAGS := $(foreach D, $(APP_SUBDIRS), -I$(LOCAL_PATH)/$(D)) \
-				-I$(LOCAL_PATH)/../include \
+				-I$(LOCAL_PATH)/../../../jni/sdl/include \
 				-I$(LOCAL_PATH)/.. \
-				-I$(LOCAL_PATH)/../../../build/python-install/include/python2.7
+				-I$(LOCAL_PATH)/../../../../build/python-install/include/python2.7
 
 
 LOCAL_CFLAGS += $(APPLICATION_ADDITIONAL_CFLAGS)
@@ -25,7 +25,7 @@ LOCAL_SHARED_LIBRARIES := $(COMPILED_LIBRARIES)
 
 LOCAL_LDLIBS := -lpython2.7 -ldl -llog -lz
 
-LOCAL_LDFLAGS += -L$(LOCAL_PATH)/../../../build/python-install/lib $(APPLICATION_ADDITIONAL_LDFLAGS)
+LOCAL_LDFLAGS += -L$(LOCAL_PATH)/../../../../build/python-install/lib $(APPLICATION_ADDITIONAL_LDFLAGS)
 
 LIBS_WITH_LONG_SYMBOLS := $(strip $(shell \
 	for f in $(LOCAL_PATH)/../../libs/$ARCH/*.so ; do \

@@ -34,11 +34,6 @@ import java.util.zip.GZIPInputStream;
 
 public class PythonActivity extends Activity implements Runnable {
 
-    // The audio thread for streaming audio...
-    private static AudioThread mAudioThread = null;
-
-    // The SDLSurfaceView we contain.
-    public static SDLSurfaceView mView = null;
 	public static PythonActivity mActivity = null;
 
     // Did we launch our thread?
@@ -60,7 +55,7 @@ public class PythonActivity extends Activity implements Runnable {
 
         Hardware.context = this;
         Action.context = this;
-		this.mActivity = this;
+		PythonActivity.mActivity = this;
 
         getWindowManager().getDefaultDisplay().getMetrics(Hardware.metrics);
 
@@ -87,17 +82,6 @@ public class PythonActivity extends Activity implements Runnable {
                 }
             }
 
-            // Let old apps know they started.
-            try {
-                FileWriter f = new FileWriter(new File(mPath, ".launch"));
-                f.write("started");
-                f.close();
-            } catch (IOException e) {
-                // pass
-            }
-
-
-
         } else if (resourceManager.getString("public_version") != null) {
             mPath = externalStorage;
         } else {
@@ -105,17 +89,15 @@ public class PythonActivity extends Activity implements Runnable {
         }
 
         // go to fullscreen mode
+        /*
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                              WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        */
 
-        // Start showing an SDLSurfaceView.
-        mView = new SDLSurfaceView(
-            this,
-            mPath.getAbsolutePath());
-
-        Hardware.view = mView;
-        setContentView(mView);
+        // can't do this since mView doesn't exist
+        Hardware.view = null; //mView;
+        setContentView(R.layout.main);
     }
 
     /**
@@ -213,13 +195,9 @@ public class PythonActivity extends Activity implements Runnable {
         unpackData("private", getFilesDir());
         unpackData("public", externalStorage);
 
-        System.loadLibrary("sdl");
-        System.loadLibrary("sdl_image");
-        System.loadLibrary("sdl_ttf");
-        System.loadLibrary("sdl_mixer");
 		System.loadLibrary("python2.7");
         System.loadLibrary("application");
-        System.loadLibrary("sdl_main");
+        System.loadLibrary("minimal_main");
 
 		System.load(getFilesDir() + "/lib/python2.7/lib-dynload/_io.so");
         System.load(getFilesDir() + "/lib/python2.7/lib-dynload/unicodedata.so");
@@ -230,33 +208,20 @@ public class PythonActivity extends Activity implements Runnable {
         } catch(UnsatisfiedLinkError e) {
         }
 
+		/*
         try {
             System.load(getFilesDir() + "/lib/python2.7/lib-dynload/_imaging.so");
             System.load(getFilesDir() + "/lib/python2.7/lib-dynload/_imagingft.so");
             System.load(getFilesDir() + "/lib/python2.7/lib-dynload/_imagingmath.so");
         } catch(UnsatisfiedLinkError e) {
         }
-
-        if ( mAudioThread == null ) {
-            Log.i("python", "starting audio thread");
-            mAudioThread = new AudioThread(this);
-        }
-
-        runOnUiThread(new Runnable () {
-                public void run() {
-                    mView.start();
-                }
-            });
+        */
     }
 
     @Override
     protected void onPause() {
         _isPaused = true;
         super.onPause();
-
-        if (mView != null) {
-            mView.onPause();
-        }
     }
 
     @Override
@@ -268,51 +233,13 @@ public class PythonActivity extends Activity implements Runnable {
             mLaunchedThread = true;
             new Thread(this).start();
         }
-
-        if (mView != null) {
-            mView.onResume();
-        }
     }
 
     public boolean isPaused() {
         return _isPaused;
     }
 
-    @Override
-    public boolean onKeyDown(int keyCode, final KeyEvent event) {
-        //Log.i("python", "key2 " + mView + " " + mView.mStarted);
-        if (mView != null && mView.mStarted && SDLSurfaceView.nativeKey(keyCode, 1, event.getUnicodeChar())) {
-            return true;
-        } else {
-            return super.onKeyDown(keyCode, event);
-        }
-    }
-
-    @Override
-    public boolean onKeyUp(int keyCode, final KeyEvent event) {
-        //Log.i("python", "key up " + mView + " " + mView.mStarted);
-        if (mView != null && mView.mStarted && SDLSurfaceView.nativeKey(keyCode, 0, event.getUnicodeChar())) {
-            return true;
-        } else {
-            return super.onKeyUp(keyCode, event);
-        }
-    }
-
-    @Override
-    public boolean dispatchTouchEvent(final MotionEvent ev) {
-
-        if (mView != null){
-            mView.onTouchEvent(ev);
-            return true;
-        } else {
-            return super.dispatchTouchEvent(ev);
-        }
-    }
-
 	protected void onDestroy() {
-		if (mView != null) {
-			mView.onDestroy();
-		}
 		//Log.i(TAG, "on destroy (exit1)");
         System.exit(0);
 	}

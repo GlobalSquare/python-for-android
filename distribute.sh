@@ -26,8 +26,7 @@ LIBS_PATH="$ROOT_PATH/build/libs"
 JAVACLASS_PATH="$ROOT_PATH/build/java"
 PACKAGES_PATH="$ROOT_PATH/.packages"
 SRC_PATH="$ROOT_PATH/src"
-JNI_PATH="$SRC_PATH/jni"
-TEMPLATE_ROOT="$SRC_PATH"
+TEMPLATE_ROOT=""
 DIST_PATH="$ROOT_PATH/dist/default"
 
 # Tools
@@ -222,8 +221,7 @@ function usage() {
 	echo "  -m 'mod1 mod2'         Modules to include"
 	echo "  -f                     Restart from scratch (remove the current build)"
         echo "  -x                     display expanded values (execute 'set -x')"
-	echo "  -t                     Path to custom template root directory"
-	echo "  -j                     Path to custom src/jni directory"
+	echo "  -t                     Path to custom app template root (src and templates) directory"
 	echo
 	exit 0
 }
@@ -569,10 +567,13 @@ function run_distribute() {
 	try cp -a $SRC_PATH/local.properties .
 	try cp -a $SRC_PATH/build.py .
 	try cp -a $SRC_PATH/buildlib .
-	try cp -a $TEMPLATE_ROOT/src .
-	try cp -a $TEMPLATE_ROOT/templates .
 	try cp -a $SRC_PATH/res .
+	try cp -a $SRC_PATH/src .
+	try cp -a $SRC_PATH/templates .
 	try cp -a $SRC_PATH/blacklist.txt .
+	if [ "X$TEMPLATE_ROOT" != "X" ]; then
+		try cp -af $TEMPLATE_ROOT/* .
+	fi
 
 	debug "Copy python distribution"
 	$BUILD_PATH/python-install/bin/python.host -OO -m compileall $BUILD_PATH/python-install
@@ -664,7 +665,7 @@ function arm_deduplicate() {
 
 
 # Do the build
-while getopts ":hvlfxtjm:d:s" opt; do
+while getopts ":hvlfxt:m:d:s" opt; do
 	case $opt in
 		h)
 			usage
@@ -693,10 +694,7 @@ while getopts ":hvlfxtjm:d:s" opt; do
 			DO_SET_X=1
 			;;
 		t)
-			TEMPLATES_PATH="$OPTARG"
-			;;
-		j)
-			JNI_PATH="$OPTARG"
+			TEMPLATE_ROOT="$OPTARG"
 			;;
 			
 		\?)
