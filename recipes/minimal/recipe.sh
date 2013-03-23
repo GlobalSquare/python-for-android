@@ -4,7 +4,7 @@ VERSION_minimal=0.1
 URL_minimal=
 MD5_minimal=
 DEPS_minimal=(python)
-BUILD_minimal=$BUILD_PATH/minimal/minimal-$VERSION_sdl
+BUILD_minimal=$BUILD_PATH/minimal/minimal-$VERSION_minimal
 RECIPE_minimal=$RECIPES_PATH/minimal
 
 function prebuild_minimal() {
