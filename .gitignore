@@ -2,6 +2,8 @@ build
 *.swp
 *.swo
 *~
+.packages
+src/minimal/libs
 src/minimal/obj
 src/obj
 src/local.properties

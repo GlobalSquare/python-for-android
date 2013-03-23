@@ -1,4 +1,4 @@
-package org.renpy.android;
+package org.kivy.android;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -216,6 +216,8 @@ public class PythonActivity extends Activity implements Runnable {
         } catch(UnsatisfiedLinkError e) {
         }
         */
+        
+        nativeInit();
     }
 
     @Override
@@ -243,5 +245,9 @@ public class PythonActivity extends Activity implements Runnable {
 		//Log.i(TAG, "on destroy (exit1)");
         System.exit(0);
 	}
+	
+    public static native void nativeSetEnv(String name, String value);
+    public static native void nativeInit();
+
 }
 
