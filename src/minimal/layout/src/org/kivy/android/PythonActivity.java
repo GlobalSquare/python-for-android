@@ -31,6 +31,7 @@ public class PythonActivity extends SherlockFragmentActivity implements Runnable
 
     // The path to the directory containing the game.
     private File mPath = null;
+    private String mArgument = null;
 
     boolean _isPaused = false;
 
@@ -47,6 +48,12 @@ public class PythonActivity extends SherlockFragmentActivity implements Runnable
         resourceManager = new ResourceManager(this);
         mFilesDirectory = getFilesDir().getAbsolutePath();
         externalStorage = new File(Environment.getExternalStorageDirectory(), getPackageName());
+        if (resourceManager.getString("public_version") != null) {
+            mPath = externalStorage;
+        } else {
+            mPath = getFilesDir();
+        }
+        mArgument = mPath.getAbsolutePath();
 
         // Figure out the directory where the game is. If the game was
         // given to us via an intent, then we use the scheme-specific
@@ -204,18 +211,20 @@ public class PythonActivity extends SherlockFragmentActivity implements Runnable
         } catch(UnsatisfiedLinkError e) {
         }
         */
-        
-        android.util.Log.i(TAG, "ANDROID_PRIVATE: " + mFilesDirectory);
-        nativeSetEnv("ANDROID_PRIVATE", mFilesDirectory);
-        android.util.Log.i(TAG, "ANDROID_ARGUMENT: " + mPath.getAbsolutePath());
-        nativeSetEnv("ANDROID_ARGUMENT", mPath.getAbsolutePath());
-        android.util.Log.i(TAG, "PYTHON_OPTIMIZE: 2");
-        nativeSetEnv("PYTHONOPTIMIZE", "2");
-        android.util.Log.i(TAG, "PYTHONHOME: " + mFilesDirectory);
-        nativeSetEnv("PYTHONHOME", mFilesDirectory);
-        android.util.Log.i(TAG, "PYTHONPATH: " + mFilesDirectory + "/lib");
-        nativeSetEnv("PYTHONPATH", /* mArgument + ":" + */ mFilesDirectory + "/lib");
 
+        android.util.Log.d(TAG, "Calling nativeSetEnv");
+        android.util.Log.v(TAG, "ANDROID_PRIVATE: " + mFilesDirectory);
+        nativeSetEnv("ANDROID_PRIVATE", mFilesDirectory);
+        android.util.Log.v(TAG, "ANDROID_ARGUMENT: " + mArgument);
+        nativeSetEnv("ANDROID_ARGUMENT", mPath.getAbsolutePath());
+        android.util.Log.v(TAG, "PYTHON_OPTIMIZE: 2");
+        nativeSetEnv("PYTHONOPTIMIZE", "2");
+        android.util.Log.v(TAG, "PYTHONHOME: " + mFilesDirectory);
+        nativeSetEnv("PYTHONHOME", mFilesDirectory);
+        android.util.Log.v(TAG, "PYTHONPATH: " + mFilesDirectory + "/lib");
+        nativeSetEnv("PYTHONPATH", mArgument + ":" + mFilesDirectory + "/lib");
+
+        android.util.Log.d(TAG, "Calling nativeInit");
         nativeInit();
     }
 
