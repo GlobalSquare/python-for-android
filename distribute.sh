@@ -26,8 +26,9 @@ LIBS_PATH="$ROOT_PATH/build/libs"
 JAVACLASS_PATH="$ROOT_PATH/build/java"
 PACKAGES_PATH="$ROOT_PATH/.packages"
 SRC_PATH="$ROOT_PATH/src"
-TEMPLATE_ROOT=""
+JNI_PATH="$SRC_PATH/jni"
 DIST_PATH="$ROOT_PATH/dist/default"
+TEMPLATE_ROOT=""
 
 # Tools
 export LIBLINK_PATH="$BUILD_PATH/objects"
