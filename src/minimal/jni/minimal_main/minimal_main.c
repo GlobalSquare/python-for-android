@@ -7,6 +7,8 @@
 #include "SDL_thread.h"
 #include "minimal_main.h"
 
+#define LOG(x) __android_log_write(ANDROID_LOG_INFO, "main", (x))
+
 /* JNI-C wrapper stuff */
 
 #ifdef __cplusplus
@@ -30,8 +32,8 @@ static int isSdcardUsed = 0;
 // JNI env stuff from sdl/src/video/android/SDL_androidvideo.c
 // Extremely wicked JNI environment to call Java functions from C code
 static JNIEnv* JavaEnv = NULL;
-static jobject JavaRenderer = NULL;
-static jclass JavaRendererClass = NULL;
+static jobject JavaActivity = NULL;
+static jclass JavaActivityClass = NULL;
 static jmethodID JavaCheckPause = NULL;
 static jmethodID JavaWaitForResume = NULL;
 
@@ -45,13 +47,13 @@ int SDL_ANDROID_CheckPause()
 {
     int rv;
     
-    rv = (*JavaEnv)->CallIntMethod( JavaEnv, JavaRenderer, JavaCheckPause );
+    rv = (*JavaEnv)->CallIntMethod( JavaEnv, JavaActivityClass, JavaCheckPause );
     return rv;
 }
 
 void SDL_ANDROID_WaitForResume()
 {
-    (*JavaEnv)->CallVoidMethod(JavaEnv, JavaRenderer, JavaWaitForResume);
+    (*JavaEnv)->CallVoidMethod(JavaEnv, JavaActivityClass, JavaWaitForResume);
 }
 
 
@@ -65,10 +67,10 @@ JAVA_EXPORT_NAME(PythonActivity_nativeInit) ( JNIEnv*  env, jobject thiz )
 
 	// from sdl/src/video/android/SDL_androidvideo.c
 	JavaEnv = env;
-	JavaRenderer = gref(thiz);
-	JavaRendererClass = (*JavaEnv)->GetObjectClass(JavaEnv, thiz);
-	JavaCheckPause = (*JavaEnv)->GetMethodID(JavaEnv, JavaRendererClass, "checkPause", "()I");
-    JavaWaitForResume = (*JavaEnv)->GetMethodID(JavaEnv, JavaRendererClass, "waitForResume", "()V");
+	JavaActivity = gref(thiz);
+	JavaActivityClass = (*JavaEnv)->GetObjectClass(JavaEnv, thiz);
+//	JavaCheckPause = (*JavaEnv)->GetMethodID(JavaEnv, JavaActivityClass, "checkPause", "()I");
+//	JavaWaitForResume = (*JavaEnv)->GetMethodID(JavaEnv, JavaActivityClass, "waitForResume", "()V");
 
 	main( argc, argv );
 };

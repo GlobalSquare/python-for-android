@@ -32,14 +32,20 @@ import java.io.IOException;
 
 import java.util.zip.GZIPInputStream;
 
-public class PythonActivity extends Activity implements Runnable {
+import org.renpy.android.*;
 
+public class PythonActivity extends Activity implements Runnable {
+	public static String TAG = "PythonActivity";
+	
 	public static PythonActivity mActivity = null;
 
     // Did we launch our thread?
     private boolean mLaunchedThread = false;
 
     private ResourceManager resourceManager;
+
+    // The name of the directory where the context stores its files.
+    private String mFilesDirectory = null;
 
     // The path to the directory contaning our external storage.
     private File externalStorage;
@@ -60,6 +66,7 @@ public class PythonActivity extends Activity implements Runnable {
         getWindowManager().getDefaultDisplay().getMetrics(Hardware.metrics);
 
         resourceManager = new ResourceManager(this);
+        mFilesDirectory = getFilesDir().getAbsolutePath();
         externalStorage = new File(Environment.getExternalStorageDirectory(), getPackageName());
 
         // Figure out the directory where the game is. If the game was
@@ -217,6 +224,17 @@ public class PythonActivity extends Activity implements Runnable {
         }
         */
         
+        android.util.Log.i(TAG, "ANDROID_PRIVATE: " + mFilesDirectory);
+        nativeSetEnv("ANDROID_PRIVATE", mFilesDirectory);
+        android.util.Log.i(TAG, "ANDROID_ARGUMENT: " + mPath.getAbsolutePath());
+        nativeSetEnv("ANDROID_ARGUMENT", mPath.getAbsolutePath());
+        android.util.Log.i(TAG, "PYTHON_OPTIMIZE: 2");
+        nativeSetEnv("PYTHONOPTIMIZE", "2");
+        android.util.Log.i(TAG, "PYTHONHOME: " + mFilesDirectory);
+        nativeSetEnv("PYTHONHOME", mFilesDirectory);
+        android.util.Log.i(TAG, "PYTHONPATH: " + mFilesDirectory + "/lib");
+        nativeSetEnv("PYTHONPATH", /* mArgument + ":" + */ mFilesDirectory + "/lib");
+
         nativeInit();
     }
 
@@ -242,7 +260,7 @@ public class PythonActivity extends Activity implements Runnable {
     }
 
 	protected void onDestroy() {
-		//Log.i(TAG, "on destroy (exit1)");
+		Log.i(TAG, "on destroy (exit1)");
         System.exit(0);
 	}
 	

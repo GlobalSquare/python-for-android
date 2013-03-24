@@ -7,7 +7,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include "SDL.h"
+// including SDL.h will rename the main function to SDL_main
+//#include "SDL.h"
 #include "android/log.h"
 
 #define LOG(x) __android_log_write(ANDROID_LOG_INFO, "python", (x))
@@ -49,6 +50,7 @@ int main(int argc, char **argv) {
 
     LOG("Initialize Python for Android");
     env_argument = getenv("ANDROID_ARGUMENT");
+    LOG("got ANDROID_ARGUMENT");
     setenv("ANDROID_APP_PATH", env_argument, 1);
 	//setenv("PYTHONVERBOSE", "2", 1);
     Py_SetProgramName(argv[0]);
