@@ -1,40 +1,19 @@
 package org.kivy.android;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.ProgressDialog;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.ActivityNotFoundException;
-import android.content.pm.ActivityInfo;
-import android.content.res.AssetManager;
-import android.content.res.Resources;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.PowerManager;
-import android.view.MotionEvent;
-import android.view.KeyEvent;
-import android.view.Window;
-import android.view.WindowManager;
-import android.widget.ImageView;
 import android.widget.Toast;
 import android.util.Log;
-import android.util.DisplayMetrics;
-import android.os.Debug;
 
 import java.io.InputStream;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.File;
-import java.io.IOException;
 
-import java.util.zip.GZIPInputStream;
+import com.actionbarsherlock.app.*;
 
-import org.renpy.android.*;
-
-public class PythonActivity extends Activity implements Runnable {
+public class PythonActivity extends SherlockFragmentActivity implements Runnable {
 	public static String TAG = "PythonActivity";
 	
 	public static PythonActivity mActivity = null;
@@ -76,6 +55,7 @@ public class PythonActivity extends Activity implements Runnable {
         //
         // Otherwise, we use the public data, if we have it, or the
         // private data if we do not.
+        /*
         if (getIntent().getAction().equals("org.renpy.LAUNCH")) {
             mPath = new File(getIntent().getData().getSchemeSpecificPart());
 
@@ -94,8 +74,9 @@ public class PythonActivity extends Activity implements Runnable {
         } else {
             mPath = getFilesDir();
         }
+        */
 
-        // go to fullscreen mode
+        // uncomment to go to fullscreen mode
         /*
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
@@ -104,7 +85,7 @@ public class PythonActivity extends Activity implements Runnable {
 
         // can't do this since mView doesn't exist
         Hardware.view = null; //mView;
-        setContentView(R.layout.main);
+        setContentView(resourceManager.getIdentifier("main", "layout"));
     }
 
     /**
