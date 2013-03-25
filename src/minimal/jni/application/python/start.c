@@ -50,6 +50,7 @@ int main(int argc, char **argv) {
 
     LOG("Initialize Python for Android");
     env_argument = getenv("ANDROID_ARGUMENT");
+    LOG("got ANDROID_ARGUMENT");
     setenv("ANDROID_APP_PATH", env_argument, 1);
 	//setenv("PYTHONVERBOSE", "2", 1);
     Py_SetProgramName(argv[0]);
