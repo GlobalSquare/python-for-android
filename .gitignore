@@ -5,9 +5,12 @@ build
 src/obj
 src/local.properties
 src/default.properties
+src/minimal/libs
+src/minimal/obj
 dist
 *.pyc
 testsuite
+.packages
 
 #ECLIPSE + PYDEV
 .project
