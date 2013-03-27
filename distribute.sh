@@ -19,10 +19,11 @@ if [ "X$PYTHON" == "X" ]; then
 fi
 
 # Paths
-ROOT_PATH="$(dirname $($PYTHON -c 'import os,sys;print os.path.realpath(sys.argv[1])' $0))"
+ROOT_PATH="$(dirname $($PYTHON -c 'from __future__ import print_function; import os,sys;print(os.path.realpath(sys.argv[1]))' $0))"
 RECIPES_PATH="$ROOT_PATH/recipes"
 BUILD_PATH="$ROOT_PATH/build"
 LIBS_PATH="$ROOT_PATH/build/libs"
+JAVACLASS_PATH="$ROOT_PATH/build/java"
 PACKAGES_PATH="$ROOT_PATH/.packages"
 SRC_PATH="$ROOT_PATH/src"
 JNI_PATH="$SRC_PATH/jni"
@@ -51,8 +52,10 @@ if [ "X$WGET" == "X" ]; then
 		echo "Error: you need at least wget or curl installed."
 		exit 1
 	else
-		WGET="$WGET -L -O"
+		WGET="$WGET -L -O -o"
 	fi
+else
+	WGET="$WGET -O"
 fi
 
 case $OSTYPE in
@@ -142,7 +145,7 @@ function push_arm() {
 	export LDFLAGS="-lm"
 
 	# this must be something depending of the API level of Android
-	PYPLATFORM=$($PYTHON -c 'import sys; print sys.platform')
+	PYPLATFORM=$($PYTHON -c 'from __future__ import print_function; import sys; print(sys.platform)')
 	if [ "$PYPLATFORM" == "linux2" ]; then
 		PYPLATFORM="linux"
 	elif [ "$PYPLATFORM" == "linux3" ]; then
@@ -222,6 +225,36 @@ function usage() {
 	exit 0
 }
 
+# Check installation state of a debian package list.
+# Return all missing packages.
+function check_pkg_deb_installed() {
+    PKGS=$1
+    MISSING_PKGS=""
+    for PKG in $PKGS; do
+        CHECK=$(dpkg -s $PKG 2>&1)
+        if [ $? -eq 1 ]; then
+           MISSING_PKGS="$PKG $MISSING_PKGS"
+        fi
+    done
+	if [ "X$MISSING_PKGS" != "X" ]; then
+		error "Packages missing: $MISSING_PKGS"
+		error "It might break the compilation, except if you installed thoses packages manually."
+	fi
+}
+
+function check_build_deps() {
+    DIST=$(lsb_release -is)
+	info "Check build dependencies for $DIST"
+    case $DIST in
+		Debian|Ubuntu)
+			check_pkg_deb_installed "build-essential zlib1g-dev cython"
+			;;
+		*)
+			debug "Avoid check build dependencies, unknow platform $DIST"
+			;;
+	esac
+}
+
 function run_prepare() {
 	info "Check enviromnent"
 	if [ "X$ANDROIDSDK" == "X" ]; then
@@ -298,6 +331,7 @@ function run_prepare() {
 	test -d $PACKAGES_PATH || mkdir -p $PACKAGES_PATH
 	test -d $BUILD_PATH || mkdir -p $BUILD_PATH
 	test -d $LIBS_PATH || mkdir -p $LIBS_PATH
+	test -d $JAVACLASS_PATH || mkdir -p $JAVACLASS_PATH
 	test -d $LIBLINK_PATH || mkdir -p $LIBLINK_PATH
 
 	# create initial files
@@ -438,7 +472,7 @@ function run_get_packages() {
 		# download if needed
 		if [ $do_download -eq 1 ]; then
 			info "Downloading $url"
-			try $WGET $url
+			try $WGET $filename $url
 		else
 			debug "Module $module already downloaded"
 		fi
@@ -545,6 +579,9 @@ function run_distribute() {
 	try mkdir -p libs/$ARCH
 	try cp -a $BUILD_PATH/libs/* libs/$ARCH/
 
+	debug "Copy java files from various libs"
+	cp -a $BUILD_PATH/java/* src
+
 	debug "Fill private directory"
 	try cp -a python-install/lib private/
 	try mkdir -p private/include/python2.7
@@ -588,6 +625,7 @@ function run_biglink() {
 }
 
 function run() {
+	check_build_deps
 	run_prepare
 	run_source_modules
 	run_get_packages
@@ -648,9 +686,9 @@ while getopts ":hvlfxm:d:s" opt; do
 		f)
 			DO_CLEAN_BUILD=1
 			;;
-                x)
-                        DO_SET_X=1
-                        ;;
+		x)
+			DO_SET_X=1
+			;;
 		\?)
 			echo "Invalid option: -$OPTARG" >&2
 			exit 1
