@@ -221,7 +221,8 @@ function usage() {
 	echo "  -l                     Show a list of available modules"
 	echo "  -m 'mod1 mod2'         Modules to include"
 	echo "  -f                     Restart from scratch (remove the current build)"
-        echo "  -x                     display expanded values (execute 'set -x')"
+        echo "  -x                     Display expanded values (execute 'set -x')"
+	echo "  -g                     Build for debugging"
 	echo
 	exit 0
 }
@@ -612,7 +613,7 @@ function run_distribute() {
 	try rm -rf lib-dynload/_ctypes_test.so
 	try rm -rf lib-dynload/_testcapi.so
 
-	if [ "X$DO_DEBUG_BUILD" == "X0" ]; then
+	if [ $DO_DEBUG_BUILD -eq 0 ]; then
 		debug "Strip libraries"
 		push_arm
 		try find "$DIST_PATH"/private "$DIST_PATH"/libs -iname '*.so' -exec $STRIP {} \;
