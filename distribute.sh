@@ -74,6 +74,7 @@ CBLUE="\x1b[34;01m"
 CGRAY="\x1b[30;01m"
 CRESET="\x1b[39;49;00m"
 DO_CLEAN_BUILD=0
+DO_DEBUG_BUILD=0
 DO_SET_X=0
 
 # Use ccache ?
@@ -611,10 +612,12 @@ function run_distribute() {
 	try rm -rf lib-dynload/_ctypes_test.so
 	try rm -rf lib-dynload/_testcapi.so
 
-	#debug "Strip libraries"
-	#push_arm
-	#try find "$DIST_PATH"/private "$DIST_PATH"/libs -iname '*.so' -exec $STRIP {} \;
-	#pop_arm
+	if [ "X$DO_DEBUG_BUILD" == "X0" ]; then
+		debug "Strip libraries"
+		push_arm
+		try find "$DIST_PATH"/private "$DIST_PATH"/libs -iname '*.so' -exec $STRIP {} \;
+		pop_arm
+	fi
 
 }
 
@@ -661,7 +664,7 @@ function arm_deduplicate() {
 
 
 # Do the build
-while getopts ":hvlfxm:d:s" opt; do
+while getopts ":hvlfxgm:d:s" opt; do
 	case $opt in
 		h)
 			usage
@@ -688,6 +691,9 @@ while getopts ":hvlfxm:d:s" opt; do
 			;;
 		x)
 			DO_SET_X=1
+			;;
+		g)
+			DO_DEBUG_BUILD=1
 			;;
 		\?)
 			echo "Invalid option: -$OPTARG" >&2
