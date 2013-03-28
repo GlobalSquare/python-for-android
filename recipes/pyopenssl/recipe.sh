@@ -25,7 +25,9 @@ function build_pyopenssl() {
 	export LDFLAGS="$LDFLAGS -L$LIBS_PATH -L$BUILD_openssl"
 
 	try $BUILD_PATH/python-install/bin/python.host setup.py build_ext -v
-	#try find build/lib.* -name "*.o" -exec $STRIP {} \;
+	if [ $DO_DEBUG_BUILD -eq 0 ]; then
+		try find build/lib.* -name "*.o" -exec $STRIP {} \;
+	fi
 
 	try $BUILD_PATH/python-install/bin/python.host setup.py install -O2
 

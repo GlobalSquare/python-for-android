@@ -136,9 +136,12 @@ function push_arm() {
 	#export OFLAG="-Os"
 	#export OFLAG="-O2"
 
-	export CFLAGS="-mandroid $OFLAG -g -fomit-frame-pointer --sysroot $NDKPLATFORM"
+	export CFLAGS="-mandroid $OFLAG -fomit-frame-pointer --sysroot $NDKPLATFORM"
 	if [ "X$ARCH" == "Xarmeabi-v7a" ]; then
-		CFLAGS+=" -march=armv7-a -g -mfloat-abi=softfp -mfpu=vfp -mthumb"
+		CFLAGS+=" -march=armv7-a -mfloat-abi=softfp -mfpu=vfp -mthumb"
+	fi
+	if [ $DO_DEBUG_BUILD -eq 1 ]; then
+		CFLAGS+=" -g"
 	fi
 	export CXXFLAGS="$CFLAGS"
 
