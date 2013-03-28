@@ -84,6 +84,7 @@ JNIEnv *SDL_ANDROID_GetJNIEnv()
     
     __android_log_print(ANDROID_LOG_DEBUG, "libSDL", "about to return JNIEnv");
 	// TODO per http://developer.android.com/training/articles/perf-jni.html "Threads"
+	// FIXME or else nasty memory leak
 	// see also http://pubs.opengroup.org/onlinepubs/009696799/functions/pthread_key_create.html
     //g_vm->DetachCurrentThread();
     return env;
