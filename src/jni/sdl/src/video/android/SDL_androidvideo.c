@@ -64,6 +64,7 @@ JNIEnv *SDL_ANDROID_GetJNIEnv()
 	// get the JavaVM from the Android app and use that to get a safe JNIEnv
 	
 	// TODO figure out how to detect threads and only use this if it's needed
+	// otherwise just cache the JNIEnv we use to get the JavaVM
     __android_log_print(ANDROID_LOG_DEBUG, "libSDL", "START: getting JNI env");
 	// TODO what if the python thread calling this is a daemon?
 	// there is also an AttachCurrentThreadAsDaemon function
