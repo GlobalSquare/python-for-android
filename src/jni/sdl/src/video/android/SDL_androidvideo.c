@@ -51,7 +51,7 @@ int SDL_ANDROID_sWindowWidth  = 640;
 int SDL_ANDROID_sWindowHeight = 480;
 
 // Extremely wicked JNI environment to call Java functions from C code
-static JNIEnv* JavaEnv = NULL;
+static JavaVM* g_vm = NULL;
 static jclass JavaRendererClass = NULL;
 static jobject JavaRenderer = NULL;
 static jmethodID JavaSwapBuffers = NULL;
@@ -60,7 +60,33 @@ static jmethodID JavaWaitForResume = NULL;
 
 JNIEnv *SDL_ANDROID_GetJNIEnv()
 {
-    return JavaEnv;
+	// don't hold on to JNIEnv or threads will crash it
+	// get the JavaVM from the Android app and use that to get a safe JNIEnv
+	
+	// TODO figure out how to detect threads and only use this if it's needed
+    __android_log_print(ANDROID_LOG_DEBUG, "libSDL", "START: getting JNI env");
+	// TODO what if the python thread calling this is a daemon?
+	// there is also an AttachCurrentThreadAsDaemon function
+    JNIEnv* env;
+    int getEnvStat = (*g_vm)->GetEnv(g_vm, (void **)&env, JNI_VERSION_1_4);
+    if (getEnvStat == JNI_EDETACHED) {
+        if ((*g_vm)->AttachCurrentThread(g_vm, (void **) &env, NULL) != 0) {
+	        // TODO handle this, means it couldn't attach
+	        __android_log_print(ANDROID_LOG_ERROR, "libSDL", "failed to attach to current thread");
+        } // else we now have a valid JNIEnv for the calling thread
+    } else if (getEnvStat == JNI_OK) {
+        //
+        __android_log_print(ANDROID_LOG_DEBUG, "libSDL", "cool...");
+    } else if (getEnvStat == JNI_EVERSION) {
+        // TODO handle this but should it ever happen with SDK >= 9?
+        __android_log_print(ANDROID_LOG_ERROR, "libSDL", "JNI version error");
+    }
+    
+    __android_log_print(ANDROID_LOG_DEBUG, "libSDL", "about to return JNIEnv");
+	// TODO per http://developer.android.com/training/articles/perf-jni.html "Threads"
+	// see also http://pubs.opengroup.org/onlinepubs/009696799/functions/pthread_key_create.html
+    //g_vm->DetachCurrentThread();
+    return env;
 }
 
 int SDL_ANDROID_CallJavaSwapBuffers()
@@ -70,6 +96,7 @@ int SDL_ANDROID_CallJavaSwapBuffers()
     SDL_ANDROID_drawTouchscreenKeyboard();
     SDL_ANDROID_processAndroidTrackballDampening();
         
+    JNIEnv *JavaEnv = SDL_ANDROID_GetJNIEnv();
     rv = (*JavaEnv)->CallIntMethod( JavaEnv, JavaRenderer, JavaSwapBuffers );
     return rv;
 
@@ -79,6 +106,7 @@ int SDL_ANDROID_CheckPause()
 {
     int rv;
     
+    JNIEnv *JavaEnv = SDL_ANDROID_GetJNIEnv();
     rv = (*JavaEnv)->CallIntMethod( JavaEnv, JavaRenderer, JavaCheckPause );
     return rv;
 }
@@ -89,6 +117,7 @@ int SDL_SYS_TimerInit();
 void SDL_ANDROID_WaitForResume()
 {
     SDL_SYS_TimerQuit();
+    JNIEnv *JavaEnv = SDL_ANDROID_GetJNIEnv();
     (*JavaEnv)->CallVoidMethod(JavaEnv, JavaRenderer, JavaWaitForResume);
     SDL_SYS_TimerInit();
 }
@@ -119,13 +148,15 @@ JAVA_EXPORT_NAME(SDLSurfaceView_nativeDone) ( JNIEnv*  env, jobject  thiz )
 JNIEXPORT void JNICALL 
 JAVA_EXPORT_NAME(SDLSurfaceView_nativeInitJavaCallbacks) ( JNIEnv*  env, jobject thiz )
 {
-	JavaEnv = env;
+	// safe to store vm as a shared global
+	(*env)->GetJavaVM(env, &g_vm);
+	
 	JavaRenderer = gref(thiz);
 	
-	JavaRendererClass = (*JavaEnv)->GetObjectClass(JavaEnv, thiz);
-	JavaSwapBuffers = (*JavaEnv)->GetMethodID(JavaEnv, JavaRendererClass, "swapBuffers", "()I");
-        JavaCheckPause = (*JavaEnv)->GetMethodID(JavaEnv, JavaRendererClass, "checkPause", "()I");
-	JavaWaitForResume = (*JavaEnv)->GetMethodID(JavaEnv, JavaRendererClass, "waitForResume", "()V");
+	JavaRendererClass = (*env)->GetObjectClass(env, thiz);
+	JavaSwapBuffers = (*env)->GetMethodID(env, JavaRendererClass, "swapBuffers", "()I");
+        JavaCheckPause = (*env)->GetMethodID(env, JavaRendererClass, "checkPause", "()I");
+	JavaWaitForResume = (*env)->GetMethodID(env, JavaRendererClass, "waitForResume", "()V");
 	
 	ANDROID_InitOSKeymap();	
 }
