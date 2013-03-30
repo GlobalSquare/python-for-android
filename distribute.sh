@@ -28,6 +28,7 @@ PACKAGES_PATH="$ROOT_PATH/.packages"
 SRC_PATH="$ROOT_PATH/src"
 JNI_PATH="$SRC_PATH/jni"
 DIST_PATH="$ROOT_PATH/dist/default"
+TEMPLATE_ROOT=""
 
 # Tools
 export LIBLINK_PATH="$BUILD_PATH/objects"
@@ -226,6 +227,7 @@ function usage() {
 	echo "  -f                     Restart from scratch (remove the current build)"
         echo "  -x                     Display expanded values (execute 'set -x')"
 	echo "  -g                     Build for debugging"
+	echo "  -t                     Path to custom app template root (src and templates) directory"
 	echo
 	exit 0
 }
@@ -571,10 +573,13 @@ function run_distribute() {
 	try cp -a $SRC_PATH/local.properties .
 	try cp -a $SRC_PATH/build.py .
 	try cp -a $SRC_PATH/buildlib .
+	try cp -a $SRC_PATH/res .
 	try cp -a $SRC_PATH/src .
 	try cp -a $SRC_PATH/templates .
-	try cp -a $SRC_PATH/res .
 	try cp -a $SRC_PATH/blacklist.txt .
+	if [ "X$TEMPLATE_ROOT" != "X" ]; then
+		try cp -af $TEMPLATE_ROOT/* .
+	fi
 
 	debug "Copy python distribution"
 	$BUILD_PATH/python-install/bin/python.host -OO -m compileall $BUILD_PATH/python-install
@@ -668,7 +673,7 @@ function arm_deduplicate() {
 
 
 # Do the build
-while getopts ":hvlfxgm:d:s" opt; do
+while getopts ":hvlfxgt:m:d:s" opt; do
 	case $opt in
 		h)
 			usage
@@ -698,6 +703,9 @@ while getopts ":hvlfxgm:d:s" opt; do
 			;;
 		g)
 			DO_DEBUG_BUILD=1
+			;;
+		t)
+			TEMPLATE_ROOT="$OPTARG"
 			;;
 		\?)
 			echo "Invalid option: -$OPTARG" >&2
