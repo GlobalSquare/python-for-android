@@ -13,6 +13,9 @@ import java.io.File;
 
 import com.actionbarsherlock.app.*;
 
+// This class can altered to extend any type of Activity (for example, SherlockFragmentActivity).
+// Also, it may be extended by a class in a different package. If you use a different class as
+// your main activity, it _must_ extend this class or the JNI bindings will fail.
 public class PythonActivity extends SherlockFragmentActivity implements Runnable {
 	public static String TAG = "PythonActivity";
 	

@@ -26,8 +26,9 @@ LIBS_PATH="$ROOT_PATH/build/libs"
 JAVACLASS_PATH="$ROOT_PATH/build/java"
 PACKAGES_PATH="$ROOT_PATH/.packages"
 SRC_PATH="$ROOT_PATH/src"
-TEMPLATE_ROOT=""
+JNI_PATH="$SRC_PATH/jni"
 DIST_PATH="$ROOT_PATH/dist/default"
+TEMPLATE_ROOT=""
 
 # Tools
 export LIBLINK_PATH="$BUILD_PATH/objects"
@@ -74,6 +75,7 @@ CBLUE="\x1b[34;01m"
 CGRAY="\x1b[30;01m"
 CRESET="\x1b[39;49;00m"
 DO_CLEAN_BUILD=0
+DO_DEBUG_BUILD=0
 DO_SET_X=0
 
 # Use ccache ?
@@ -138,6 +140,9 @@ function push_arm() {
 	export CFLAGS="-mandroid $OFLAG -fomit-frame-pointer --sysroot $NDKPLATFORM"
 	if [ "X$ARCH" == "Xarmeabi-v7a" ]; then
 		CFLAGS+=" -march=armv7-a -mfloat-abi=softfp -mfpu=vfp -mthumb"
+	fi
+	if [ $DO_DEBUG_BUILD -eq 1 ]; then
+		CFLAGS+=" -g"
 	fi
 	export CXXFLAGS="$CFLAGS"
 
@@ -220,7 +225,8 @@ function usage() {
 	echo "  -l                     Show a list of available modules"
 	echo "  -m 'mod1 mod2'         Modules to include"
 	echo "  -f                     Restart from scratch (remove the current build)"
-        echo "  -x                     display expanded values (execute 'set -x')"
+        echo "  -x                     Display expanded values (execute 'set -x')"
+	echo "  -g                     Build for debugging"
 	echo "  -t                     Path to custom app template root (src and templates) directory"
 	echo
 	exit 0
@@ -615,10 +621,12 @@ function run_distribute() {
 	try rm -rf lib-dynload/_ctypes_test.so
 	try rm -rf lib-dynload/_testcapi.so
 
-	debug "Strip libraries"
-	push_arm
-	try find "$DIST_PATH"/private "$DIST_PATH"/libs -iname '*.so' -exec $STRIP {} \;
-	pop_arm
+	if [ $DO_DEBUG_BUILD -eq 0 ]; then
+		debug "Strip libraries"
+		push_arm
+		try find "$DIST_PATH"/private "$DIST_PATH"/libs -iname '*.so' -exec $STRIP {} \;
+		pop_arm
+	fi
 
 }
 
@@ -665,7 +673,7 @@ function arm_deduplicate() {
 
 
 # Do the build
-while getopts ":hvlfxt:m:d:s" opt; do
+while getopts ":hvlfxgt:m:d:s" opt; do
 	case $opt in
 		h)
 			usage
@@ -693,10 +701,12 @@ while getopts ":hvlfxt:m:d:s" opt; do
 		x)
 			DO_SET_X=1
 			;;
+		g)
+			DO_DEBUG_BUILD=1
+			;;
 		t)
 			TEMPLATE_ROOT="$OPTARG"
 			;;
-			
 		\?)
 			echo "Invalid option: -$OPTARG" >&2
 			exit 1

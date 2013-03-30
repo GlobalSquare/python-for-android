@@ -30,6 +30,11 @@ function prebuild_python() {
 	try patch -p1 < $RECIPE_python/patches/fix-remove-corefoundation.patch
 	try patch -p1 < $RECIPE_python/patches/fix-dynamic-lookup.patch
 
+	# for debug
+	if [ $DO_DEBUG_BUILD -eq 1 ]; then
+		try patch -p1 < $RECIPE_python/patches/no-optim.patch
+	fi
+
 	system=$(uname -s)
 	if [ "X$system" == "XDarwin" ]; then
 		try patch -p1 < $RECIPE_python/patches/fix-configure-darwin.patch
@@ -68,6 +73,11 @@ function build_python() {
 		debug "Activate flags for sqlite3"
 		export CFLAGS="$CFLAGS -I$BUILD_sqlite3"
 		export LDFLAGS="$LDFLAGS -L$SRC_PATH/obj/local/$ARCH/"
+	fi
+
+	if [ $DO_DEBUG_BUILD -eq 1 ]; then
+		# ok, it's a bit ugly
+		sed 's/-O3/-O0/' -i configure
 	fi
 
 	try ./configure --host=arm-eabi --prefix="$BUILD_PATH/python-install" --enable-shared --disable-toolbox-glue --disable-framework
