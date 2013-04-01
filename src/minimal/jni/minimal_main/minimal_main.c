@@ -100,7 +100,7 @@ JAVA_EXPORT_NAME(PythonActivity_nativeInit) ( JNIEnv*  env, jobject thiz )
 	
 	JavaActivity = gref(thiz);
 	
-	JavaActivityClass = (*env)->GetObjectClass(env, thiz);
+	JavaActivityClass = gref((*env)->GetObjectClass(env, thiz));
 	
 //	JavaCheckPause = (*JavaEnv)->GetMethodID(JavaEnv, JavaActivityClass, "checkPause", "()I");
 //	JavaWaitForResume = (*JavaEnv)->GetMethodID(JavaEnv, JavaActivityClass, "waitForResume", "()V");
