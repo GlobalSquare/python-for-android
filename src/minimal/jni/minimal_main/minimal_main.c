@@ -45,7 +45,7 @@ JNIEnv *SDL_ANDROID_GetJNIEnv()
 	
 	// TODO figure out how to detect threads and only use this if it's needed
 	// otherwise just cache the JNIEnv we use to get the JavaVM
-    __android_log_print(ANDROID_LOG_DEBUG, "libSDL", "START: getting JNI env");
+        //__android_log_print(ANDROID_LOG_DEBUG, "libSDL", "START: getting JNI env");
 	// TODO what if the python thread calling this is a daemon?
 	// there is also an AttachCurrentThreadAsDaemon function
     JNIEnv* env;
@@ -57,13 +57,13 @@ JNIEnv *SDL_ANDROID_GetJNIEnv()
         } // else we now have a valid JNIEnv for the calling thread
     } else if (getEnvStat == JNI_OK) {
         //
-        __android_log_print(ANDROID_LOG_DEBUG, "libSDL", "cool...");
+        //__android_log_print(ANDROID_LOG_DEBUG, "libSDL", "cool...");
     } else if (getEnvStat == JNI_EVERSION) {
         // TODO handle this but should it ever happen with SDK >= 9?
         __android_log_print(ANDROID_LOG_ERROR, "libSDL", "JNI version error");
     }
     
-    __android_log_print(ANDROID_LOG_DEBUG, "libSDL", "about to return JNIEnv");
+    //__android_log_print(ANDROID_LOG_DEBUG, "libSDL", "about to return JNIEnv");
 	// TODO per http://developer.android.com/training/articles/perf-jni.html "Threads"
 	// FIXME or else nasty memory leak
 	// see also http://pubs.opengroup.org/onlinepubs/009696799/functions/pthread_key_create.html
@@ -102,8 +102,8 @@ JAVA_EXPORT_NAME(PythonActivity_nativeInit) ( JNIEnv*  env, jobject thiz )
 	
 	JavaActivityClass = gref((*env)->GetObjectClass(env, thiz));
 	
-//	JavaCheckPause = (*JavaEnv)->GetMethodID(JavaEnv, JavaActivityClass, "checkPause", "()I");
-//	JavaWaitForResume = (*JavaEnv)->GetMethodID(JavaEnv, JavaActivityClass, "waitForResume", "()V");
+//	JavaCheckPause = gref((*env)->GetMethodID(env, JavaActivityClass, "checkPause", "()I"));
+//	JavaWaitForResume = gref((*env)->GetMethodID(env, JavaActivityClass, "waitForResume", "()V"));
 
 	main( argc, argv );
 };
